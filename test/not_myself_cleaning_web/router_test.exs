@@ -1,24 +1,25 @@
 defmodule NotMyselfCleaningWeb.RouterTest do
   use ExUnit.Case, async: true
-  use Plug.Test
+  import Plug.Conn
+  import Plug.Test
 
-  @opts NotMyselfCleaningWeb.Router.init([])
+  @opts NotMyselfCleaningWeb.Endpoint.init([])
 
-  test "renders the home page" do
+  test "redirects the home page to login" do
     conn =
       :get
       |> conn("/")
-      |> NotMyselfCleaningWeb.Router.call(@opts)
+      |> NotMyselfCleaningWeb.Endpoint.call(@opts)
 
-    assert conn.status == 200
-    assert conn.resp_body =~ "Not Myself Cleaning"
+    assert conn.status == 302
+    assert get_resp_header(conn, "location") == ["/login"]
   end
 
   test "returns health status" do
     conn =
       :get
       |> conn("/health")
-      |> NotMyselfCleaningWeb.Router.call(@opts)
+      |> NotMyselfCleaningWeb.Endpoint.call(@opts)
 
     assert conn.status == 200
     assert Jason.decode!(conn.resp_body) == %{"status" => "ok"}

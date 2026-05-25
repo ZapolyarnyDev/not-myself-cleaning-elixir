@@ -1,34 +1,51 @@
 defmodule NotMyselfCleaningWeb.Router do
-  @moduledoc false
+  use Phoenix.Router
+  import Plug.Conn
+  import Phoenix.Controller
 
-  use Plug.Router
-
-  plug Plug.RequestId
-  plug Plug.Logger
-
-  plug Plug.Static,
-    at: "/assets",
-    from: {:not_myself_cleaning_elixir, "priv/static/assets"},
-    gzip: false
-
-  plug :match
-  plug :dispatch
-
-  get "/" do
-    conn
-    |> put_resp_content_type("text/html; charset=utf-8")
-    |> send_resp(200, NotMyselfCleaningWeb.PageHTML.home())
+  pipeline :browser do
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_flash)
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+    plug(:load_current_user)
   end
 
-  get "/health" do
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(%{status: "ok"}))
+  scope "/", NotMyselfCleaningWeb do
+    pipe_through(:browser)
+
+    get("/health", AuthController, :health)
+    get("/", AuthController, :home)
+    get("/register", AuthController, :register_page)
+    post("/register", AuthController, :register)
+    get("/login", AuthController, :login_page)
+    post("/login", AuthController, :login)
+    post("/logout", AuthController, :logout)
+
+    get("/requests", RequestController, :index)
+    get("/requests/new", RequestController, :new)
+    post("/requests", RequestController, :create)
+
+    get("/admin", AdminController, :index)
+    post("/admin/status", AdminController, :update_status)
   end
 
-  match _ do
-    conn
-    |> put_resp_content_type("text/plain; charset=utf-8")
-    |> send_resp(404, "Not found")
+  defp load_current_user(conn, _opts) do
+    case get_session(conn, :session_token) do
+      nil ->
+        assign(conn, :current_user, nil)
+
+      token ->
+        case NotMyselfCleaning.Accounts.get_session(token) do
+          nil ->
+            conn
+            |> delete_session(:session_token)
+            |> assign(:current_user, nil)
+
+          session ->
+            assign(conn, :current_user, session)
+        end
+    end
   end
 end

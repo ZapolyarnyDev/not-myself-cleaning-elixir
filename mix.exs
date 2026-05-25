@@ -20,10 +20,14 @@ defmodule NotMyselfCleaning.MixProject do
 
   defp deps do
     [
-      {:plug_cowboy, "~> 2.7"},
-      {:jason, "~> 1.4"},
+      {:phoenix, "~> 1.7.14"},
+      {:phoenix_ecto, "~> 4.6"},
+      {:phoenix_html, "~> 4.1"},
+      {:phoenix_live_view, "~> 1.0.0"},
       {:ecto_sql, "~> 3.13"},
-      {:postgrex, "~> 0.20"}
+      {:postgrex, "~> 0.20"},
+      {:plug_cowboy, "~> 2.7"},
+      {:jason, "~> 1.4"}
     ]
   end
 end
