@@ -1,0 +1,24 @@
+<section class="auth-panel">
+  <div class="auth-copy">
+    <p class="eyebrow">Клининговый портал</p>
+    <h1>Вход в систему</h1>
+    <p class="lead">Оформляйте уборку, отслеживайте статусы и храните историю обращений в одном кабинете.</p>
+  </div>
+
+  <form class="form" action="/login" method="post">
+    <input type="hidden" name="_csrf_token" value={get_csrf_token()}>
+    <%= if @error != "" do %>
+      <p class="alert"><%= @error %></p>
+    <% end %>
+    <label>
+      <span>Логин</span>
+      <input name="login" value={Map.get(@values, "login", "")} autocomplete="username" required>
+    </label>
+    <label>
+      <span>Пароль</span>
+      <input name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit">Войти</button>
+    <p class="muted">Нет аккаунта? <a href="/register">Зарегистрируйтесь</a></p>
+  </form>
+</section>
