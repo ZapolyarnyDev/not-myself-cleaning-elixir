@@ -1,0 +1,66 @@
+<section class="section-heading">
+  <div>
+    <p class="eyebrow">Заявка на уборку</p>
+    <h1>Новая заявка</h1>
+  </div>
+</section>
+
+<form class="form wide-form" action="/requests" method="post" data-request-form>
+  <input type="hidden" name="_csrf_token" value={get_csrf_token()}>
+  <%= if @error != "" do %>
+    <p class="alert"><%= @error %></p>
+  <% end %>
+  <label>
+    <span>Адрес</span>
+    <input name="address" value={Map.get(@values, "address", "")} placeholder="Москва, ул. Примерная, 10, кв. 25" required>
+  </label>
+  <label>
+    <span>Контактные данные</span>
+    <input name="contact" value={Map.get(@values, "contact", "")} placeholder="Телефон, email или мессенджер" required>
+  </label>
+  <div class="date-picker" data-date-picker data-initial-value={Map.get(@values, "date_time", "")}>
+    <input name="date_time" type="hidden" value={Map.get(@values, "date_time", "")} required>
+    <div class="date-picker__top">
+      <div>
+        <span class="field-title">Желаемая дата и время</span>
+        <p class="date-picker__hint">Московское время, запись доступна со следующего дня</p>
+      </div>
+      <output class="date-picker__value" data-date-picker-value>Не выбрано</output>
+    </div>
+    <div class="date-picker__calendar">
+      <div class="date-picker__nav">
+        <button type="button" class="icon-button" data-month-prev aria-label="Предыдущий месяц">‹</button>
+        <strong data-month-label></strong>
+        <button type="button" class="icon-button" data-month-next aria-label="Следующий месяц">›</button>
+      </div>
+      <div class="date-picker__weekdays" aria-hidden="true">
+        <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+      </div>
+      <div class="date-picker__days" data-calendar-days></div>
+    </div>
+    <div>
+      <span class="field-title">Время</span>
+      <div class="time-slots" data-time-slots></div>
+    </div>
+    <p class="date-picker__error" data-date-picker-error hidden>Выберите дату и время из доступных вариантов</p>
+  </div>
+  <label>
+    <span>Вид услуги</span>
+    <select name="service" required>
+      <option value="">Выберите услугу</option>
+      <%= for service <- services() do %>
+        <option value={service} selected={Map.get(@values, "service") == service}><%= service %></option>
+      <% end %>
+    </select>
+  </label>
+  <label>
+    <span>Тип оплаты</span>
+    <select name="payment" required>
+      <option value="">Выберите оплату</option>
+      <%= for payment <- payments() do %>
+        <option value={payment} selected={Map.get(@values, "payment") == payment}><%= payment %></option>
+      <% end %>
+    </select>
+  </label>
+  <button type="submit">Создать заявку</button>
+</form>

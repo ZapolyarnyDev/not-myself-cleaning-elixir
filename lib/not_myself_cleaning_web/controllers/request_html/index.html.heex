@@ -1,0 +1,34 @@
+<section class="section-heading">
+  <div>
+    <p class="eyebrow">Личный кабинет</p>
+    <h1>История заявок</h1>
+  </div>
+  <a class="button" href="/requests/new">Оставить заявку</a>
+</section>
+
+<section class="request-list">
+  <%= if Enum.empty?(@requests) do %>
+    <div class="empty">Пока заявок нет. Можно сразу заказать уборку.</div>
+  <% end %>
+
+  <%= for request <- @requests do %>
+    <article class="request-card">
+      <div class="card-head">
+        <div>
+          <h2><%= request.service %></h2>
+          <p><%= request.address %></p>
+        </div>
+        <span class={"status status-#{request.status}"}><%= status_labels()[request.status] %></span>
+      </div>
+      <dl>
+        <div><dt>Дата и время</dt><dd><%= String.replace(request.date_time, "T", " ") %></dd></div>
+        <div><dt>Оплата</dt><dd><%= request.payment %></dd></div>
+        <div><dt>Контакты</dt><dd><%= request.contact %></dd></div>
+        <div><dt>Создана</dt><dd><%= Calendar.strftime(request.created_at, "%Y-%m-%d %H:%M:%S") %></dd></div>
+      </dl>
+      <%= if request.status_comment != "" do %>
+        <p class="reason">Пояснение администратора: <%= request.status_comment %></p>
+      <% end %>
+    </article>
+  <% end %>
+</section>
