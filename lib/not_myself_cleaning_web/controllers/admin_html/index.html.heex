@@ -1,0 +1,63 @@
+<section class="section-heading">
+  <div>
+    <p class="eyebrow">Панель администратора</p>
+    <h1>Все заявки</h1>
+  </div>
+</section>
+
+<%= if @error != "" do %>
+  <p class="alert page-alert"><%= @error %></p>
+<% end %>
+
+<section class="admin-list">
+  <%= if Enum.empty?(@requests) do %>
+    <div class="empty">Заявок пока нет.</div>
+  <% end %>
+
+  <%= for request <- @requests do %>
+    <% is_locked = request.status in ["done", "cancelled"] %>
+    <% next_statuses = if request.status == "new", do: ["in_work", "cancelled"], else: ["done", "cancelled"] %>
+    <article class="request-card admin-card">
+      <div class="card-head">
+        <div>
+          <h2><%= request.service %></h2>
+          <p><%= request.full_name %>, <%= request.phone %>, <%= request.email %></p>
+        </div>
+        <span class={"status status-#{request.status}"}><%= status_labels()[request.status] %></span>
+      </div>
+      <dl>
+        <div><dt>Адрес</dt><dd><%= request.address %></dd></div>
+        <div><dt>Контакты заявки</dt><dd><%= request.contact %></dd></div>
+        <div><dt>Дата и время</dt><dd><%= String.replace(request.date_time, "T", " ") %></dd></div>
+        <div><dt>Оплата</dt><dd><%= request.payment %></dd></div>
+      </dl>
+      <%= if request.status_comment != "" do %>
+        <p class="reason">Пояснение: <%= request.status_comment %></p>
+      <% end %>
+      <%= if is_locked do %>
+        <p class="locked-note">Статус финальный, изменить его нельзя.</p>
+      <% else %>
+        <form class="status-form" action="/admin/status" method="post">
+          <input type="hidden" name="_csrf_token" value={get_csrf_token()}>
+          <input type="hidden" name="request_id" value={request.id}>
+          <label>
+            <span>Новый статус</span>
+            <select name="status" required>
+              <option value="">Выберите статус</option>
+              <%= for {value, label} <- status_labels() do %>
+                <%= if value in next_statuses do %>
+                  <option value={value}><%= label %></option>
+                <% end %>
+              <% end %>
+            </select>
+          </label>
+          <label>
+            <span>Пояснение</span>
+            <textarea name="comment" rows="3" placeholder="Почему меняется статус" required></textarea>
+          </label>
+          <button type="submit">Обновить</button>
+        </form>
+      <% end %>
+    </article>
+  <% end %>
+</section>
