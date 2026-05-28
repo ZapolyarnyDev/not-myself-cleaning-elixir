@@ -22,7 +22,7 @@ erl_crash.dump
 /.nix-mix/
 /.nix-hex/
 
-priv/static/upoads
+priv/static/uploads
 
 .DS_Store
 Thumbs.db

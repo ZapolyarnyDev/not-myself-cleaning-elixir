@@ -1,6 +1,22 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set dotenv-load := true
 
+setup:
+  mix deps.get
+
+format:
+  mix format
+
+test:
+  mix test
+
+check:
+  mix format --check-formatted
+  mix test
+
+server:
+  mix run --no-halt
+
 db-init:
   initdb "$PGDATA"
 
