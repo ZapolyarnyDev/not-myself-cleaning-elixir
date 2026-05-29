@@ -1,6 +1,9 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set dotenv-load := true
 
+default:
+  @just --list
+
 setup:
   mix deps.get
 
@@ -15,7 +18,57 @@ check:
   mix test
 
 server:
-  mix run --no-halt
+  mix phx.server
+
+console:
+  iex -S mix phx.server
+
+compile:
+  mix compile
+
+clean:
+  mix clean
+
+db-create:
+  mix ecto.create
+
+db-drop:
+  mix ecto.drop
+
+db-migrate:
+  mix ecto.migrate
+
+db-rollback:
+  mix ecto.rollback
+
+db-rollback-all:
+  mix ecto.rollback --all
+
+db-reset:
+  mix ecto.reset
+
+db-status:
+  mix ecto.migrations
+
+db-gen-migration name:
+  mix ecto.gen.migration {{name}}
+
+init:
+  just setup
+  just db-create
+  just db-migrate
+
+deps-update:
+  mix deps.update --all
+
+deps-outdated:
+  mix hex.outdated
+
+routes:
+  mix phx.routes
+
+test-coverage:
+  mix test --cover
 
 db-init:
   initdb "$PGDATA"
@@ -27,7 +80,7 @@ db-start:
 db-stop:
   pg_ctl -D "$PGDATA" stop
 
-db-reset:
+db-local-reset:
   rm -rf .data/postgres
   just db-init
   just db-start
